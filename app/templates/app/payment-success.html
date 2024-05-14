@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .product {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 100px;
+        }
+
+        .product img {
+            max-width: 150px;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+
+        .product-info {
+            flex-grow: 1;
+        }
+
+        .product-info h2 {
+            margin-bottom: 10px;
+        }
+
+        .product-info p {
+            margin: 5px 0;
+        }
+
+        .btn {
+           
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: dodgerblue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Payment Successful</h1>
+        </div>
+        <div class="product">
+            <img src="{{product.image.url}}" alt="{{product.name}}">
+            <div class="product-info">
+                <h2>{{product.name}}</h2>
+                <p><strong>Price:</strong> ${{product.price}}</p>
+                <p><strong>Description:</strong> {{product.description}}</p>
+            </div>
+            <a href="{% url 'productos' %}" class="btn">Inicio</a>
+        </div>
+    </div>
+</body>
+</html>
+
+{% endblock %}
