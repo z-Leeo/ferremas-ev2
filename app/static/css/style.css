@@ -38,7 +38,7 @@
   }
   
 
-  *login-registro*/
+  /*login-registro*/
 
 
   .wrapper{
@@ -571,4 +571,113 @@
     max-width: 400px;
     max-height: 300px;
   }
+
+  .card {
+    border: 2px solid #f17000;
+    border-radius: 8px ;
+ 
+    background-color: #303030;
+  }
+
+
+
+  /*form contact*/
+
+.bn632-hover {
+  width: 160px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  height: 45px;
+  margin-bottom: 5px;
+  text-align:center;
+  border: none;
+  background-size: 300% 100%;
+  border-radius: 50px;
+  moz-transition: all .4s ease-in-out;
+  -o-transition: all .4s ease-in-out;
+  -webkit-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
+}
+
+.bn632-hover:hover {
+  background-position: 100% 0;
+  moz-transition: all .4s ease-in-out;
+  -o-transition: all .4s ease-in-out;
+  -webkit-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
+}
+
+.bn632-hover:focus {
+  outline: none;
+}
+
+.bn632-hover.bn28 {
+  background-image: linear-gradient(
+    to right,
+    #920007,
+    #cb0108,
+    #dc070f,
+    #ff2732
+  );
+  box-shadow: 0 5px 15px rgba(242, 97, 103, 0.4);
+}
+
+.btn-contenedor{
+  text-align: center;
+}
+
+.contact .row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 80px;
+}
+
+.contact .row .img2{
+  flex: 1 1 35rem;
+}
+
+.imgcontact{
+ 
+  height: auto;
+}
+
+.contact .row .img2 img{
+  max-width: 100%;
+  
+  transform: translateY(16px);
+  
+}
+
+.contact .row form{
+  flex: 1 1 35rem;
+  box-shadow: 0 1rem 2rem rgba(.1,0,0,.5);
+  border-radius: .5rem;
+}
+
+.contact .row form .inputBox{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content:space-between;
+}
+
+.contact .row form .inputBox input,
+.contact .row form textarea {
+  width: 49%;
+  margin: 1rem 0;
+  padding:1rem;
+  font-size: 1.0rem;
+  color:#000000;
+  background:#cacaca;
+  text-transform: none;
+}
+
+.contact .row form textarea{
+  height:18rem;
+  resize:none;
+  width:100%;
+}
+
   

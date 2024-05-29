@@ -1,0 +1,244 @@
+{% extends 'base.html'%}
+{% block contenido %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <style>
+        /* Estilos CSS para carrito van aquí */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container2 {
+            
+            max-width: 800px;
+            margin: 200px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .imagenC {
+            max-width: 100px;
+            height: auto;
+        }
+
+        .update-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .update-form input[type="number"] {
+            width: 60px;
+            margin-right: 10px;
+        }
+
+        .update-form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .total-section {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .checkout-btn {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container2">
+        <h1>Carrito de Compras</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>Imagen</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in productos_en_carrito %}
+                <tr>
+                    <td>{{ item.producto.name }}</td>
+                    <td>${{ item.producto.price }}</td>
+                    <td>
+                        <form class="update-form" action="{% url 'carrito'  %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="producto_id" value="{{ item.producto.id }}">
+                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1">
+                            <button type="submit">Actualizar</button>
+                        </form>
+                    </td>
+                    <td>${{ item.total }}</td>
+                    <td><img class="imagenC" src="{{ item.producto.image.url }}" alt="{{ item.producto.name }}"></td>
+                    <td>
+                        <form class="delete-form" action="{% url 'eliminar_producto' item.producto.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="total-section">
+            <h2>Total: ${{ total_carrito }}</h2>
+            <a href="{% url 'checkout' %}">Pagar</a>
+        </div>
+    </div>
+</body>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteForms = document.querySelectorAll('.delete-form');
+
+    deleteForms.forEach(form => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    // Eliminar la fila del producto eliminado del DOM
+                    const deletedRow = form.closest('tr');
+                    deletedRow.parentNode.removeChild(deletedRow);
+
+                    // Actualizar el precio total del carrito
+                    const totalElement = document.querySelector('.total-section h2');
+                    const newTotal = response.headers.get('X-Total-Carrito');
+                    if (newTotal) {
+                        totalElement.textContent = `Total: $${newTotal}`;
+                    }
+                } else {
+                    console.error('Error al eliminar el producto');
+                }
+            } catch (error) {
+                console.error('Error al eliminar el producto:', error);
+            }
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const carritoData = JSON.parse('{{ carrito_json|escapejs }}');
+
+    const renderCarrito = () => {
+        const carritoTable = document.getElementById('carrito-table');
+        carritoTable.innerHTML = ''; // Limpiar la tabla antes de renderizar
+
+        carritoData.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.nombre}</td>
+                <td>$${item.precio}</td>
+                <td>
+                    <input type="number" name="cantidad-${item.id}" value="${item.cantidad}" min="1">
+                </td>
+                <td>$${item.precio * item.cantidad}</td>
+                <td>
+                    <button class="update-btn" data-id="${item.id}">Actualizar</button>
+                </td>
+            `;
+            carritoTable.appendChild(row);
+        });
+    };
+
+    renderCarrito();
+
+    const updateCarrito = () => {
+        // Recopilar datos actualizados del carrito
+        const updatedCarritoData = carritoData.map(item => ({
+            ...item,
+            cantidad: parseInt(document.querySelector(`input[name="cantidad-${item.id}"]`).value),
+        }));
+
+        // Enviar datos actualizados al servidor
+        fetch('/actualizar-carrito/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify(updatedCarritoData),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Actualizar la página después de una actualización exitosa
+                window.location.reload();
+            } else {
+                console.error('Error al actualizar el carrito');
+            }
+        })
+        .catch(error => {
+            console.error('Error al actualizar el carrito:', error);
+        });
+    };
+
+    // Manejar clic en botón de actualización
+    document.addEventListener('click', event => {
+        if (event.target.classList.contains('update-btn')) {
+            updateCarrito();
+        }
+    });
+});
+
+
+
+</script>
+
+
+</html>
+
+{% endblock %}

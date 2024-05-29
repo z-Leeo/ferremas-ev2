@@ -14,9 +14,6 @@
 <body>
 
     <style>
-
-   
-
         .container {
             display: flex;
             flex-wrap: wrap;
@@ -28,7 +25,7 @@
         .card {
             width: 250px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid #ff9d00;
             border-radius: 5px;
             overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -67,7 +64,7 @@
             border: none;
             border-radius: 3px;
             background-color: dodgerblue;
-            color: #fff;
+            color: #ffffff;
             text-align: center;
             text-decoration: none;
             cursor: pointer;
@@ -75,7 +72,7 @@
         }
 
         .btn:hover {
-            background-color: #007bff;
+            background-color: #ff9d00;
         }
         .img {
             max-width: 100%;
@@ -153,7 +150,49 @@
             </div>
         </div>
         <!-- Agrega más tarjetas según sea necesario -->
+
     </div>
+<br><br>
+    <section class="contact" id="contact">
+        <h1 class="heading">
+            <span>C</span>
+            <span>o</span>
+            <span>n</span>
+            <span>t</span>
+            <span>a</span>
+            <span>c</span>
+            <span>t</span>
+            <span>o</span>
+        </h1>
+        
+        <div class="row">
+            <h4>Envianos tus dudas para poder tener una mejor atención al usuario y las atenderemos a la brevedad por nuestros ejecutivos,
+                solo atenderemos dias habiles de la semana, excluye feriados.
+            </h4>
+            <div class="img2">
+                <img class="imgcontact" decoding="async" src="{% static 'img/banner.jpg' %}" alt="">
+            </div>
+            <form  method="post">
+              
+              {% csrf_token %}
+    
+    
+                <div class="inputBox">
+                    <input type="text" placeholder="Nombre" name="nombre">
+                    <input type="email" placeholder="Email" name="email">
+                </div>
+                <div class="inputBox">
+                    <input type="number" placeholder="Número" name="numero">
+                    <input type="text" placeholder="Asunto" name="asunto">
+                </div>
+                <textarea placeholder="Mensaje" name="mensaje" cols="30" rows="10" ></textarea>
+                <div class="btn-contenedor">
+                <input type="submit" class="bn632-hover bn28" value="Enviar">
+                </div>
+            </form>
+        </div>
+    </section>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -161,7 +200,7 @@
     </body>
 </body>
 </html>
-<link rel="stylesheet" href="{% static 'js/java.js' %}">
+<script src="{% static 'app/js/java.js' %}"></script>
 </html>
 
 {% endblock %}

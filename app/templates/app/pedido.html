@@ -1,0 +1,155 @@
+{% extends 'base.html'%}
+{% block contenido %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            background-color: #ffffff;
+            margin-top: 300px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section-title {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-row label {
+            font-weight: bold;
+        }
+
+        .form-row input,
+        .form-row select {
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .btn-submit {
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: dodgerblue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .btn-submit:hover {
+            background-color: #007acc;
+        }
+
+        .order-summary {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <form action="/submit_order" method="post">
+        <div class="container">
+            <!-- Información Personal -->
+            <div class="form-section">
+                <div class="form-section-title">Información Personal</div>
+                <div class="form-row">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-row">
+                    <label for="domicilio">Domicilio</label>
+                    <input type="text" id="domicilio" name="domicilio" required>
+                </div>
+                <div class="form-row">
+                    <label for="celular">Celular</label>
+                    <input type="tel" id="celular" name="celular" required>
+                </div>
+                <div class="form-row">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+            </div>
+
+            <!-- Método de Pedido y Método de Pago -->
+            <div class="form-section">
+                <div class="form-section-title">Método de Pedido y Pago</div>
+                <div class="form-row">
+                    <label for="metodo-pedido">Método de Pedido</label>
+                    <select id="metodo-pedido" name="metodo-pedido" required>
+                        <option value="delivery">Delivery</option>
+                        <option value="pickup">Retiro en tienda</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="metodo-pago">Método de Pago</label>
+                    <select id="metodo-pago" name="metodo-pago" required>
+                        <option value="credit-card">Tarjeta de Crédito</option>
+                        <option value="debit-card">Tarjeta de Débito</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="cash">Efectivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resumen del Pedido -->
+            <div class="form-section">
+                <div class="form-section-title">Resumen del Pedido</div>
+                <div class="order-summary">
+                    <p><strong>Producto 1:</strong> Descripción del producto 1</p>
+                    <p><strong>Producto 2:</strong> Descripción del producto 2</p>
+                    <!-- Más productos según sea necesario -->
+                    <p><strong>Total:</strong> $XX.XX</p>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Realizar Pedido</button>
+    </form>
+</body>
+</html>
+
+
+
+
+{% endblock %}

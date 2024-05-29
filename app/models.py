@@ -1,6 +1,6 @@
 from django.db import models
+import uuid
 
-# Create your models here.
 class Marca(models.Model):
     name = models.CharField(max_length=50)
 
@@ -8,7 +8,6 @@ class Marca(models.Model):
         return self.name
 
 class Product(models.Model):
-
     name = models.CharField(max_length=225)
     marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     description = models.TextField()
@@ -24,4 +23,15 @@ class CarritoItem(models.Model):
 
     @property
     def total(self):
-        return self.product.price * self.cantidad
+        return self.producto.price * self.cantidad
+
+    
+class Contacto (models.Model):
+    nombre = models.CharField(max_length=50)
+    email = models.EmailField()
+    numero = models.IntegerField()
+    asunto = models.CharField(max_length=50)
+    mensaje = models.TextField()
+
+    def __str__(self):
+        return self.nombre

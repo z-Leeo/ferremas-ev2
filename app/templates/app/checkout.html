@@ -18,33 +18,44 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
         .product-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             margin-top: 20px;
         }
 
         .product {
+            width: 100%;
+            max-width: 600px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            margin-top: 50px;
-            margin-bottom: 40px;
-            padding: 20px;
+            margin-bottom: 20px;
+            padding: 10px;
             border-radius: 10px;
             background-color: #ffffff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .img {
-            width: 80%;
+        .product img {
+            width: 120px;
+            height: auto;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-info p {
+            margin: 5px 0;
         }
 
         .btn-purchase {
@@ -55,29 +66,43 @@
             border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            display: block;
+            margin: 20px auto;
         }
 
         .btn-purchase:hover {
             background-color: #007acc;
         }
+
+        .total-section {
+            text-align: center;
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-       <center> <h1 style="margin-top: 100px;">Verificar Producto: {{product.name}}</h1></center>
+        <center><h1 style="margin-top: 100px;">Resumen de Compra</h1></center>
         <div class="product-container">
+            {% for item in carrito_items %}
             <div class="product">
-                <img class="img" src="{{product.image.url}}" alt="">
-                <p><strong>Nombre: {{product.name}}</strong></p>
-                <p>Precio: $ {{product.price}}</p>
-                <p>Marca: {{product.marca}}</p>
-                <p>Descripción: {{product.description}}</p>
-                <button class="btn-purchase">{{paypal.render}}</button>
-            </div>  
+                <img src="{{ item.producto.image.url }}" alt="{{ item.producto.name }}">
+                <div class="product-info">
+                    <p><strong>Nombre: {{ item.producto.name }}</strong></p>
+                    <p>Precio: $ {{ item.producto.price }}</p>
+                    <p>Cantidad: {{ item.cantidad }}</p>
+                    <p>Total: $ {{ item.total }}</p>
+                    <p>Marca: {{ item.producto.marca }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="total-section">
+            <h2>Total a Pagar: $ {{ total_carrito }}</h2>
+            <button class="btn-purchase">{{ paypal.render }}</button>
         </div>
     </div>
 </body>
 </html>
-
 
 {% endblock %}

@@ -36,25 +36,54 @@
             max-height: 200px;
             margin-bottom: 10px;
         }
+
+        .cart-card {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .btn-cart {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 
-    <h1>Products</h1>
-    <div class="container">
-        {% for i in products %}
-            <div class="products">
-                <a href="{% url 'checkout' i.id %}">
-                    <img class="img" src="{{i.image.url}}" alt="">
-                </a><br>
-                <p>Nombre: {{i.name}}</p>
-                <p>Marca: {{i.marca}}</p>
-                <p>Descripción: {{i.description}}</p>
-                <p>Precio: $ {{i.price}}</p>
-                
-                <a href="{% url 'checkout' i.id %}">Añadir a carrito</a>
-            </div>
-        {% endfor %}
-    </div>
-   
+<h1>Products</h1>
+<div class="container">
+    {% for product in entity %}
+        <div class="products">
+            <img class="img" src="{{ product.image.url }}" alt="">
+            <br>
+            <p>Nombre: {{ product.name }}</p>
+            <p>Marca: {{ product.marca }}</p>
+            <p>Descripción: {{ product.description }}</p>
+            <p>Precio: $ {{ product.price }}</p>
+            <form action="{% url 'carrito' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="producto_id" value="{{ product.id }}">
+                <button type="submit">Añadir al carrito</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="cart-card">
+    <a href="{% url 'carrito' %}">
+        <button class="btn-cart">Ver Carrito</button>
+    </a>
+</div>
+
 </body>
 </html>
 
