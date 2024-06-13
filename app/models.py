@@ -1,5 +1,7 @@
-from django.db import models
+from django.db import models 
 import uuid
+from django.contrib.auth.models import AbstractUser, Group, Permission
+
 
 class Marca(models.Model):
     name = models.CharField(max_length=50)
@@ -35,3 +37,22 @@ class Contacto (models.Model):
 
     def __str__(self):
         return self.nombre
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = (
+        ('bodeguero', 'Bodeguero'),
+        ('contador', 'Contador'),
+        ('administrador', 'Administrador'),
+        ('vendedor', 'Vendedor'),
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customuser_set',  # Cambia esto para evitar el conflicto
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customuser_set',  # Cambia esto para evitar el conflicto
+        blank=True,
+    )

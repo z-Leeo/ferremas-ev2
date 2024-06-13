@@ -77,13 +77,14 @@
             <h1>Payment Successful</h1>
         </div>
         <div class="product">
-            <img src="{{product.image.url}}" alt="{{product.name}}">
+            <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
             <div class="product-info">
-                <h2>{{product.name}}</h2>
-                <p><strong>Price:</strong> ${{product.price}}</p>
-                <p><strong>Description:</strong> {{product.description}}</p>
+                <h2>{{ producto.name }}</h2>
+                <p><strong>Price:</strong> ${{ producto.price }}</p>
+                <p><strong>Description:</strong> {{ producto.description }}</p>
             </div>
             <a href="{% url 'productos' %}" class="btn">Inicio</a>
+            <h2>Total de la compra: $ {{ total_carrito }}</h2>
         </div>
     </div>
 </body>

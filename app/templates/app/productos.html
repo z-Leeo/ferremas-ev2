@@ -78,6 +78,10 @@
     {% endfor %}
 </div>
 
+<div class="">
+    {% include 'app/paginator.html' %}
+</div>
+
 <div class="cart-card">
     <a href="{% url 'carrito' %}">
         <button class="btn-cart">Ver Carrito</button>

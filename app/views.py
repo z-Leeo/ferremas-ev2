@@ -4,7 +4,7 @@ from paypal.standard.forms import PayPalPaymentsForm
 from django.conf import settings
 import uuid
 from django.urls import reverse
-from django.contrib.auth import  logout
+from django.contrib.auth import  logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import user_passes_test
@@ -15,6 +15,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.http import Http404
+from rest_framework import viewsets
+from .serializers import ProductSerializer
+
+class ProductViewset(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 
@@ -36,7 +42,42 @@ def home (request):
     return render (request , 'app/home.html')
 
 def login(request):
-    return render(request, 'registration/login.html')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            if user.role == 'bodeguero':
+                return redirect('bodeguero_view')
+            elif user.role == 'contador':
+                return redirect('contador_view')
+            elif user.role == 'administrador':
+                return redirect('administrador_view')
+            elif user.role == 'vendedor':
+                return redirect('vendedor_view')
+            else:
+                return redirect('default_home')
+        else:
+            return render(request, 'registration/login.html', {'error': 'Invalid login'})
+    else:
+        return render(request, 'registration/login.html')
+
+@login_required
+def bodeguero_view(request):
+    return render(request, 'app/bodeguero.html')
+
+@login_required
+def contador_view(request):
+    return render(request, 'app/contador.html')
+
+@login_required
+def administrador_view(request):
+    return render(request, 'administrador.html')
+
+@login_required
+def vendedor_view(request):
+    return render(request, 'vendedor.html')
 
 def registro(request):
     return render(request, 'registration/registro.html')

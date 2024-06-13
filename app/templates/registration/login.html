@@ -4,21 +4,18 @@
 
 {% block contenido %}
 
-
 <body class="loginBody">
-    
-
 
 <div class="contenidologin">
 
 <div class="wrapper login-w">
-    <div class="form-box login" >
+    <div class="form-box login">
         <h2 class="text-login">Ingresar</h2>
         <form action="#" method="POST">
             {% csrf_token %} 
             <div class="input-box">
                 <span class="icon"><ion-icon name="mail"></ion-icon></span>
-                <input type="tex" name="username" required>
+                <input type="text" name="username" required>
                 <label for="">usuario</label>
             </div>
             <div class="input-box">
@@ -32,9 +29,7 @@
             </div>
             <button type="submit" class="btn-login">Ingresar</button>
             <div class="login-register">
-                <p class="textologin">¿No tienes una cuenta?<a 
-            
-                    href="{% url 'registro' %}" class="register-link"> Registrar</a></p>
+                <p class="textologin">¿No tienes una cuenta?<a href="{% url 'registro' %}" class="register-link"> Registrar</a></p>
             </div>
         </form>
     </div>
