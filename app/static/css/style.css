@@ -681,3 +681,79 @@
 }
 
   
+
+/*barra buscar*/
+.botonBusc{
+  width: 100%;
+  max-width: 300px;
+  height: 50px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.botonBusc{
+  padding-top: 100px;
+}
+
+.form-box h2{
+  font-size: 2em;
+  color: #b6b7b8;
+  text-align: center;
+}
+
+.input-box1{
+  position: relative;
+  width: 100%;
+  height: 50px;
+  border-bottom: 2px solid #ffffff;
+  margin: 30px 0;
+}
+
+.input-box1 label{
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  font-size: 1em;
+  color: #162938;
+  font-weight: 500;
+  pointer-events: none;
+  transition: .5s;
+}
+
+.input-box1 input:focus~label,
+.input-box1 input:valid~label{
+  top: -5px;
+}
+
+.input-box1 input{
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0 35px 0 5px;
+
+}
+
+.input-box1 .icon{
+  position: absolute;
+  right: 8px;
+  font-size: 1.2em;
+  color: #162938;
+  line-height: 57px;
+
+}
+
+.bx-search{
+  position: absolute;
+  left: 280px;
+  top: 10px;
+  
+}

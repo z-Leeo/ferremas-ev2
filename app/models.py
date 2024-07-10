@@ -1,6 +1,6 @@
 from django.db import models 
 import uuid
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser, Group, Permission, User
 
 
 class Marca(models.Model):
@@ -14,6 +14,7 @@ class Product(models.Model):
     marca = models.ForeignKey(Marca, on_delete=models.PROTECT)
     description = models.TextField()
     price = models.IntegerField()
+    stock = models.PositiveIntegerField(default=0)  # Nuevo campo de stock
     image = models.ImageField(upload_to="Products", null=True)
 
     def __str__(self):
@@ -39,20 +40,10 @@ class Contacto (models.Model):
         return self.nombre
 
 class CustomUser(AbstractUser):
-    ROLE_CHOICES = (
+    USER_TYPES = [
         ('bodeguero', 'Bodeguero'),
         ('contador', 'Contador'),
         ('administrador', 'Administrador'),
         ('vendedor', 'Vendedor'),
-    )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    groups = models.ManyToManyField(
-        Group,
-        related_name='customuser_set',  # Cambia esto para evitar el conflicto
-        blank=True,
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='customuser_set',  # Cambia esto para evitar el conflicto
-        blank=True,
-    )
+    ]
+    user_type = models.CharField(max_length=20, choices=USER_TYPES, default='vendedor')

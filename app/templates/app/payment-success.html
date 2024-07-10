@@ -56,7 +56,6 @@
         }
 
         .btn {
-           
             padding: 10px 20px;
             border-radius: 5px;
             background-color: dodgerblue;
@@ -84,7 +83,9 @@
                 <p><strong>Description:</strong> {{ producto.description }}</p>
             </div>
             <a href="{% url 'productos' %}" class="btn">Inicio</a>
-            <h2>Total de la compra: $ {{ total_carrito }}</h2>
+        </div>
+        <div class="total-section">
+            <h2>Total de la compra: {{ total_carrito }} {{ moneda_seleccionada }}</h2>
         </div>
     </div>
 </body>

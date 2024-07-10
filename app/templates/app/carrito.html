@@ -1,4 +1,4 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
 {% block contenido %}
 {% load static %}
 
@@ -15,7 +15,6 @@
         }
 
         .container2 {
-            
             max-width: 800px;
             margin: 200px auto;
             padding: 20px;
@@ -89,11 +88,36 @@
         .delete-btn:hover {
             background-color: #ff0000;
         }
+
+        .refresh-btn {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .refresh-btn:hover {
+            background-color: #007B9E;
+        }
     </style>
 </head>
 <body>
     <div class="container2">
         <h1>Carrito de Compras</h1>
+        
+        <div class="currency">
+            <label for="currency-selector">Selecciona la divisa:</label>
+            <select class="form-control" id="currency-selector">
+                <option value="USD" selected>USD</option>
+                <option value="EUR">EUR</option>
+                <option value="CLP">CLP</option>
+            </select>
+        </div>
+        <br>
+
         <table>
             <thead>
                 <tr>
@@ -105,20 +129,20 @@
                     <th>Eliminar</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="carrito-table">
                 {% for item in productos_en_carrito %}
                 <tr>
                     <td>{{ item.producto.name }}</td>
-                    <td>${{ item.producto.price }}</td>
+                    <td class="price" data-price="{{ item.producto.price }}">$ {{ item.producto.price }}</td>
                     <td>
-                        <form class="update-form" action="{% url 'carrito'  %}" method="POST">
+                        <form class="update-form" action="{% url 'carrito' %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="producto_id" value="{{ item.producto.id }}">
                             <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1">
                             <button type="submit">Actualizar</button>
                         </form>
                     </td>
-                    <td>${{ item.total }}</td>
+                    <td class="total" data-total="{{ item.total }}">$ {{ item.total }}</td>
                     <td><img class="imagenC" src="{{ item.producto.image.url }}" alt="{{ item.producto.name }}"></td>
                     <td>
                         <form class="delete-form" action="{% url 'eliminar_producto' item.producto.id %}" method="POST">
@@ -131,114 +155,12 @@
             </tbody>
         </table>
         <div class="total-section">
-            <h2>Total: ${{ total_carrito }}</h2>
+            <h2>Total: $<span id="total-carrito" data-total="{{ total_carrito }}">{{ total_carrito }}</span></h2>
             <a href="{% url 'checkout' %}">Pagar</a>
         </div>
     </div>
+    <script src="{% static 'js/java2.js' %}"></script>
 </body>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const deleteForms = document.querySelectorAll('.delete-form');
-
-    deleteForms.forEach(form => {
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(form);
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                });
-                if (response.ok) {
-                    // Eliminar la fila del producto eliminado del DOM
-                    const deletedRow = form.closest('tr');
-                    deletedRow.parentNode.removeChild(deletedRow);
-
-                    // Actualizar el precio total del carrito
-                    const totalElement = document.querySelector('.total-section h2');
-                    const newTotal = response.headers.get('X-Total-Carrito');
-                    if (newTotal) {
-                        totalElement.textContent = `Total: $${newTotal}`;
-                    }
-                } else {
-                    console.error('Error al eliminar el producto');
-                }
-            } catch (error) {
-                console.error('Error al eliminar el producto:', error);
-            }
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const carritoData = JSON.parse('{{ carrito_json|escapejs }}');
-
-    const renderCarrito = () => {
-        const carritoTable = document.getElementById('carrito-table');
-        carritoTable.innerHTML = ''; // Limpiar la tabla antes de renderizar
-
-        carritoData.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.nombre}</td>
-                <td>$${item.precio}</td>
-                <td>
-                    <input type="number" name="cantidad-${item.id}" value="${item.cantidad}" min="1">
-                </td>
-                <td>$${item.precio * item.cantidad}</td>
-                <td>
-                    <button class="update-btn" data-id="${item.id}">Actualizar</button>
-                </td>
-            `;
-            carritoTable.appendChild(row);
-        });
-    };
-
-    renderCarrito();
-
-    const updateCarrito = () => {
-        // Recopilar datos actualizados del carrito
-        const updatedCarritoData = carritoData.map(item => ({
-            ...item,
-            cantidad: parseInt(document.querySelector(`input[name="cantidad-${item.id}"]`).value),
-        }));
-
-        // Enviar datos actualizados al servidor
-        fetch('/actualizar-carrito/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: JSON.stringify(updatedCarritoData),
-        })
-        .then(response => {
-            if (response.ok) {
-                // Actualizar la página después de una actualización exitosa
-                window.location.reload();
-            } else {
-                console.error('Error al actualizar el carrito');
-            }
-        })
-        .catch(error => {
-            console.error('Error al actualizar el carrito:', error);
-        });
-    };
-
-    // Manejar clic en botón de actualización
-    document.addEventListener('click', event => {
-        if (event.target.classList.contains('update-btn')) {
-            updateCarrito();
-        }
-    });
-});
-
-
-
-</script>
-
-
 </html>
 
 {% endblock %}

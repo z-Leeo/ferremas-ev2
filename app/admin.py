@@ -7,23 +7,30 @@ admin.site.register(Product)
 admin.site.register(Marca)
 admin.site.register(Contacto)
 
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser
+from django.utils.translation import gettext, gettext_lazy as _
+
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff')
-    list_filter = ('role', 'is_staff', 'is_superuser', 'is_active')
-    search_fields = ('username', 'first_name', 'last_name', 'email')
-    ordering = ('username',)
+    model = CustomUser
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
-        ('Role', {'fields': ('role',)}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (_('User Type'), {'fields': ('user_type',)}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'role'),
+            'fields': ('username', 'password1', 'password2', 'user_type'),
         }),
     )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'user_type')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    ordering = ('username',)
 
 admin.site.register(CustomUser, CustomUserAdmin)

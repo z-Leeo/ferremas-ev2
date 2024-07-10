@@ -1,4 +1,4 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
 {% block contenido %}
 {% load static %}
 
@@ -58,9 +58,35 @@
             font-size: 16px;
         }
     </style>
+<br><br><br><br><br>
+<h1>Productos</h1>
 
-<h1>Products</h1>
+<div class="botonBusc">
+    <form method="get" action="{% url 'buscar' %}">
+        <div class="search-box">
+          <div class="input-box1">
+            <i class='bx bx-search'></i>
+            <input type="text" type="submit" placeholder="Buscar..." name="buscar">
+          </div>
+        </div>
+    </form>
+</div>
+
+<br><br><br><br><br>
+
+<div class="currency">
+    <label for="currency-selector">Selecciona la divisa:</label>
+    <select class="form-control" id="currency-selector">
+      <option value="USD" selected>USD</option>
+      <option value="EUR">EUR</option>
+      <option value="CLP">CLP</option>
+    </select>
+</div>
+
 <div class="container">
+    
+    <br>
+
     {% for product in entity %}
         <div class="products">
             <img class="img" src="{{ product.image.url }}" alt="">
@@ -68,10 +94,12 @@
             <p>Nombre: {{ product.name }}</p>
             <p>Marca: {{ product.marca }}</p>
             <p>Descripción: {{ product.description }}</p>
-            <p>Precio: $ {{ product.price }}</p>
+            <p class="price" data-price="{{ product.price }}">Precio: $ {{ product.price }}</p>
+            <p>Stock: {{ product.stock }}</p> <!-- Mostrar el stock disponible -->
             <form action="{% url 'carrito' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="producto_id" value="{{ product.id }}">
+                <input type="hidden" name="cantidad" min="1" max="{{ product.stock }}" value="1"> <!-- Limitar cantidad al stock disponible -->
                 <button type="submit">Añadir al carrito</button>
             </form>
         </div>
@@ -88,6 +116,7 @@
     </a>
 </div>
 
+<script src="{% static 'js/java2.js' %}"></script>
 </body>
 </html>
 

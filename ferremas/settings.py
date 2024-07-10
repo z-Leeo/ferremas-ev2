@@ -136,10 +136,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-PAYPAL_RECEIVER_EMAIL = 'sb-985v231144990@personal.example.com'
+PAYPAL_RECEIVER_EMAIL = 'sb-ny76j31150645@personal.example.com'
 PAYPAL_TEST = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#pass: "#&m2Z5I - G$8&ZqAL - 68N)<e>q  - 8^[sB%bs - 8u?C'Fg| - G$8&ZqAL - SN#6w>$N - m_0t<Q2u
+#pass: "#&m2Z5I - G$8&ZqAL - 68N)<e>q  - 8^[sB%bs - 8u?C'Fg| - G$8&ZqAL - SN#6w>$N - m_0t<Q2u - +-F3UdWn
+
+CURRENCY_API_KEY = '07c7436812f210f455d48d84'

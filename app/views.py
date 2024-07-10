@@ -16,11 +16,29 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.http import Http404
 from rest_framework import viewsets
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, MarcaSerializer
+
+
+
+
+class MarcaViewset(viewsets.ModelViewSet):
+    queryset = Marca.objects.all()
+    serializer_class = MarcaSerializer
+
 
 class ProductViewset(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        productos = Product.objects.all()
+
+        name = self.request.GET.get('name')
+
+        if name:
+            productos = productos.filter(name__contains=name)
+
+        return productos
 
 
 
@@ -41,27 +59,30 @@ def home (request):
         return redirect('home')
     return render (request , 'app/home.html')
 
-def login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+from django.shortcuts import redirect
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.forms import AuthenticationForm
+from django.views import View
+
+class LoginView(View):
+    def get(self, request):
+        form = AuthenticationForm()
+        return render(request, 'registration/login.html', {'form': form})
+
+    def post(self, request):
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             auth_login(request, user)
-            if user.role == 'bodeguero':
-                return redirect('bodeguero_view')
-            elif user.role == 'contador':
-                return redirect('contador_view')
-            elif user.role == 'administrador':
-                return redirect('administrador_view')
-            elif user.role == 'vendedor':
-                return redirect('vendedor_view')
-            else:
-                return redirect('default_home')
-        else:
-            return render(request, 'registration/login.html', {'error': 'Invalid login'})
-    else:
-        return render(request, 'registration/login.html')
+            if user.user_type == 'bodeguero':
+                return redirect('bodeguero')
+            elif user.user_type == 'contador':
+                return redirect('contador')
+            elif user.user_type == 'administrador':
+                return redirect('administrador')
+            elif user.user_type == 'vendedor':
+                return redirect('vendedor')
+        return render(request, 'registration/login.html', {'form': form})
 
 @login_required
 def bodeguero_view(request):
@@ -73,11 +94,11 @@ def contador_view(request):
 
 @login_required
 def administrador_view(request):
-    return render(request, 'administrador.html')
+    return render(request, 'app/administrador.html')
 
 @login_required
 def vendedor_view(request):
-    return render(request, 'vendedor.html')
+    return render(request, 'app/vendedor.html')
 
 def registro(request):
     return render(request, 'registration/registro.html')
@@ -90,21 +111,61 @@ def pedido(request):
 def currencyApi(request):
     return render(request, 'app/currencyApi.html')
 
+import json
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.views.decorators.http import require_GET
+import requests
+import logging
+logger = logging.getLogger(__name__)
+
+def convert_currency(request):
+    if request.method == 'GET' and 'currency' in request.GET:
+        target_currency = request.GET['currency']
+        
+        # URL de la API de conversión de moneda
+        api_url = f'https://v6.exchangerate-api.com/v6/07c7436812f210f455d48d84/latest/'
+        
+        try:
+            response = requests.get(api_url)
+            data = response.json()
+            
+            if response.status_code == 200 and 'conversion_rates' in data:
+                rates = data['conversion_rates']
+                
+                if target_currency in rates:
+                    rate = rates[target_currency]
+                    return JsonResponse({'success': True, 'rate': rate})
+                else:
+                    return JsonResponse({'success': False, 'error': f'No se encontró la tasa para {target_currency}'})
+            else:
+                logger.error(f'Error al obtener las tasas de cambio - Status code: {response.status_code}, Data: {data}')
+                return JsonResponse({'success': False, 'error': 'Error al obtener las tasas de cambio'})
+        
+        except requests.RequestException as e:
+            logger.error(f'Error en la solicitud HTTP: {str(e)}')
+            return JsonResponse({'success': False, 'error': f'Error en la solicitud HTTP: {str(e)}'})
+    
+    return JsonResponse({'success': False, 'error': 'Método no permitido o parámetros faltantes'})
+
+
+
 @login_required
 def ProductView(request):
-    # Ordena los productos por el campo 'nombre' (puedes cambiar 'nombre' por el campo que desees)
+   # Ordena los productos por el campo 'nombre' (puedes cambiar 'nombre' por el campo que desees)
     get_products = Product.objects.all()  
     page = request.GET.get('page', 1)
-
     try:
         paginator = Paginator(get_products, 9)
         get_products = paginator.page(page)
     except:
         raise Http404
+    
 
     data = {
         'entity': get_products,
-        'paginator': paginator
+        'paginator': paginator,
+        
     }
 
     return render(request, 'app/productos.html', data)
@@ -114,10 +175,6 @@ def CheckOut(request):
     carrito_items = CarritoItem.objects.all()
     host = request.get_host()
 
-    carrito = CarritoItem.objects.all()
-    total_carrito = sum(item.total for item in carrito)
-
-    
     if not carrito_items:
         return HttpResponseBadRequest('El carrito está vacío')
 
@@ -139,49 +196,26 @@ def CheckOut(request):
     context = {
         'carrito_items': carrito_items,
         'paypal': paypal_payment,
-        'total_carrito': total_carrito,
+        'total_carrito': total_amount,
     }
 
     return render(request, 'app/checkout.html', context)
 
+@login_required
 def PaymentSuccessful(request):
+    carrito_items = CarritoItem.objects.all()
+    for item in carrito_items:
+        producto = item.producto
+        producto.stock -= item.cantidad
+        producto.save()
+    
     CarritoItem.objects.all().delete()  # Limpiar el carrito después del pago exitoso
     return render(request, 'app/payment-success.html')
 
+@login_required
 def paymentFailed(request):
     return render(request, 'app/payment-failed.html')
 
-
-def registro(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        is_trabajador = 'trabajador' in request.POST
-        is_ingtec = 'ingtec' in request.POST
-        is_supervisor = 'supervisor' in request.POST
-
-        if not any([is_trabajador, is_ingtec, is_supervisor]):
-            # Puedes manejar el error de alguna manera, por ejemplo, mostrar un mensaje de error.
-            return render(request, 'registration/registro.html', {'error_message': 'Selecciona al menos un grupo de usuario.'})
-
-        # Crear el usuario
-        user = User.objects.create_user(username=username, password=password)
-
-        # Asignar el grupo correspondiente al usuario
-        if is_trabajador:
-            trabajador_group, _ = Group.objects.get_or_create(name='trabajador')
-            user.groups.add(trabajador_group)
-        if is_ingtec:
-            ingtec_group, _ = Group.objects.get_or_create(name='ingtec')
-            user.groups.add(ingtec_group)
-        if is_supervisor:
-            supervisor_group, _ = Group.objects.get_or_create(name='supervisor')
-            user.groups.add(supervisor_group)
-
-        # Redirigir a la página de inicio de sesión
-        return redirect('login')  # Reemplaza 'nombre_de_la_url_de_login' con el nombre de la URL de tu vista de inicio de sesión.
-
-    return render(request, 'registration/registro.html')
 
 def salir(request):
     logout(request)
@@ -204,10 +238,7 @@ def carrito(request):
                 return HttpResponseBadRequest('Producto no encontrado')
             cantidad = int(request.POST.get('cantidad', 1))
             carrito_item, created = CarritoItem.objects.get_or_create(producto=producto)
-            if not created:
-                carrito_item.cantidad += cantidad
-            else:
-                carrito_item.cantidad = cantidad
+            carrito_item.cantidad = cantidad  # Aquí se actualiza la cantidad directamente
             carrito_item.save()
             return redirect('carrito')  # Redirigir a la página del carrito sin ningún argumento
         else:
@@ -226,6 +257,27 @@ def eliminar_producto(request, producto_id):
     carrito_item = get_object_or_404(CarritoItem, producto__id=producto_id)
     carrito_item.delete()
     return redirect('carrito')
+
+from django.db.models import Q
+
+
+@login_required
+def buscar(request):
+    termino = request.GET.get('buscar', '')
+
+    # Filtra los productos según el término de búsqueda
+    productos = Product.objects.filter(
+        Q(name__icontains=termino) | 
+        Q(marca__name__icontains=termino)
+    )
+
+
+    data = {
+        'entity': productos,
+        'termino': termino
+    }
+
+    return render(request, 'app/productos.html', data)
 
 
 

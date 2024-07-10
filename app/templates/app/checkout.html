@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
 {% block contenido %}
-
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,8 +96,8 @@
             {% endfor %}
         </div>
         <div class="total-section">
-            <h2>Total a Pagar: $ {{ total_carrito }}</h2>
-            <button class="btn-purchase">{{ paypal.render }}</button>
+            <h2>Total a Pagar: {{ total_carrito }} {{ moneda_seleccionada }}</h2>
+            {{ paypal.render }}  <!-- PayPal form rendering -->
         </div>
     </div>
 </body>
