@@ -27,7 +27,6 @@ SECRET_KEY = 'django-insecure--3%8js(pfy7hy2dew04#jpjl##!_j6^$^2^l=xcxon6r-t)c%=
 DEBUG = True
 
 
-AUTH_USER_MODEL = 'app.CustomUser'
 ALLOWED_HOSTS = []
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -58,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middleware.RoleRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'ferremas.urls'
@@ -115,6 +115,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -136,12 +138,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-PAYPAL_RECEIVER_EMAIL = 'sb-ny76j31150645@personal.example.com'
+PAYPAL_RECEIVER_EMAIL = 'sb-2gqju31635351@personal.example.com'
 PAYPAL_TEST = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#pass: "#&m2Z5I - G$8&ZqAL - 68N)<e>q  - 8^[sB%bs - 8u?C'Fg| - G$8&ZqAL - SN#6w>$N - m_0t<Q2u - +-F3UdWn
+#pass: "# - He#Z1Pz; - "#&m2Z5I - Be8o-'g5 - 0xL0?mUv - >iF=(V0b - >iF=(V0b - 0i$3X>c, - t.[vb)M2
 
 CURRENCY_API_KEY = '07c7436812f210f455d48d84'

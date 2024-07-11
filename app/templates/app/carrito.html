@@ -156,7 +156,11 @@
         </table>
         <div class="total-section">
             <h2>Total: $<span id="total-carrito" data-total="{{ total_carrito }}">{{ total_carrito }}</span></h2>
-            <a href="{% url 'checkout' %}">Pagar</a>
+            <form action="{% url 'pedido' %}" method="get">
+                {% csrf_token %}
+                <input type="hidden" name="total_carrito" value="{{ total_carrito }}">
+                <button type="submit" class="checkout-btn">Pagar</button>
+            </form>
         </div>
     </div>
     <script src="{% static 'js/java2.js' %}"></script>

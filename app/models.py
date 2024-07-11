@@ -1,7 +1,7 @@
 from django.db import models 
 import uuid
-from django.contrib.auth.models import AbstractUser, Group, Permission, User
-
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 
 class Marca(models.Model):
     name = models.CharField(max_length=50)
@@ -38,12 +38,28 @@ class Contacto (models.Model):
 
     def __str__(self):
         return self.nombre
+    
+from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
-    USER_TYPES = [
-        ('bodeguero', 'Bodeguero'),
-        ('contador', 'Contador'),
-        ('administrador', 'Administrador'),
-        ('vendedor', 'Vendedor'),
-    ]
-    user_type = models.CharField(max_length=20, choices=USER_TYPES, default='vendedor')
+    # Agregar campos adicionales si es necesario
+    
+    class Meta:
+        # Opcionalmente, puedes añadir configuraciones adicionales aquí
+        pass
+
+    # Agregar related_name para evitar conflictos de acceso inverso
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        related_name='custom_user_set',  # Cambia a un nombre que prefieras
+        related_query_name='user'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        related_name='custom_user_set',  # Cambia a un nombre que prefieras
+        related_query_name='user'
+    )

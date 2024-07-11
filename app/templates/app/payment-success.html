@@ -2,14 +2,12 @@
 
 {% block contenido %}
 
-{% load static %}
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment successful</title>
+    <title>Pago Exitoso</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,7 +32,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin: 100px;
+            margin-bottom: 20px;
         }
 
         .product img {
@@ -71,22 +69,43 @@
     </style>
 </head>
 <body>
+    <br><br><br><br><br><br>
+    <h1>Pago Exitoso</h1>
     <div class="container">
-        <div class="header">
-            <h1>Payment Successful</h1>
-        </div>
-        <div class="product">
-            <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
-            <div class="product-info">
-                <h2>{{ producto.name }}</h2>
-                <p><strong>Price:</strong> ${{ producto.price }}</p>
-                <p><strong>Description:</strong> {{ producto.description }}</p>
+    <div>
+        <h3>Información Personal</h3>
+        <p><strong>Nombre:</strong> {{ nombre }}</p>
+        <p><strong>Domicilio:</strong> {{ domicilio }}</p>
+        <p><strong>Celular:</strong> {{ celular }}</p>
+        <p><strong>Email:</strong> {{ email }}</p>
+    </div>
+    <div>
+        <h3>Método de Pedido y Pago</h3>
+        <p><strong>Método de Pedido:</strong> {{ metodo_pedido }}</p>
+        <p><strong>Método de Pago:</strong> {{ metodo_pago }}</p>
+    </div>
+        {% if carrito_items %}
+            {% for item in carrito_items %}
+                <div class="product">
+                    <br><br><br><br><br><br><br><br>
+                    <img src="{{ item.producto.image.url }}" alt="{{ item.producto.name }}">
+                    <div class="product-info">
+                        <h2>{{ item.producto.name }}</h2>
+                        <p><strong>Precio:</strong> ${{ item.producto.price }}</p>
+                        <p><strong>Descripción:</strong> {{ item.producto.description }}</p>
+                        <p><strong>Cantidad:</strong> {{ item.cantidad }}</p>
+                        <p><strong>Total:</strong> ${{ item.total }}</p>
+                        
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="total-section">
+                <h2>Total de la compra: {{ total_carrito }} {{ moneda_seleccionada }}</h2>
             </div>
-            <a href="{% url 'productos' %}" class="btn">Inicio</a>
-        </div>
-        <div class="total-section">
-            <h2>Total de la compra: {{ total_carrito }} {{ moneda_seleccionada }}</h2>
-        </div>
+        {% else %}
+            <p>No hay productos en el carrito.</p>
+        {% endif %}
+        <a href="{% url 'productos' %}" class="btn">Inicio</a>
     </div>
 </body>
 </html>

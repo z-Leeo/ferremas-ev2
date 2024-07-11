@@ -11,9 +11,28 @@
     <title>Document</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+<div class="banner">
+    <img src="{% static 'img/banner-ferreteria.jpg' %}" class="img" >
+</div>
 <body>
 
     <style>
+        .banner {
+            width: 100%; /* Asegura que el banner ocupe todo el ancho disponible */
+            height: 300px; /* Ajusta la altura según sea necesario */
+            overflow: hidden;
+            position: relative;
+        }
+
+        .banner img {
+            width: 100%; /* Ajusta la imagen para ocupar todo el ancho del contenedor */
+            height: 100%; /* Ajusta la altura automáticamente para mantener la proporción */
+            object-fit: cover; /* Ajusta la imagen para cubrir todo el espacio disponible */
+            object-position: center; /* Centra la imagen horizontalmente */
+            display: block;
+        }
+
+        /* Estilos adicionales para el resto de la página */
         .container {
             display: flex;
             flex-wrap: wrap;
@@ -33,7 +52,7 @@
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-20px);
         }
 
         .card img {
@@ -74,17 +93,9 @@
         .btn:hover {
             background-color: #ff9d00;
         }
-        .img {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            margin: 0 auto; /* Esto centra la imagen horizontalmente */
-        }
 
     </style>
-<div class="banner">
-    <img src="{% static 'img/banner-ferreteria.jpg' %}" class="img" >
-</div>
+
 
     <div class="container2 mt-4">
         
@@ -130,7 +141,7 @@
             <div class="card-body">
                 <h3 class="card-title">Motosierra</h3>
                 <p class="card-text">Motosierra Makita.</p>
-                <a href="#" class="btn">Comprar ahora</a>
+                <a href="{% url 'productos' %}" class="btn">Ver mas</a>
             </div>
         </div>
         <div class="card">
@@ -138,7 +149,7 @@
             <div class="card-body">
                 <h3 class="card-title">Sierra Circular</h3>
                 <p class="card-text">Sierra circular de 1600W</p>
-                <a href="#" class="btn">Comprar ahora</a>
+                <a href="{% url 'productos' %}" class="btn">Ver mas</a>
             </div>
         </div>
         <div class="card">
@@ -146,7 +157,7 @@
             <div class="card-body">
                 <h3 class="card-title">Generador</h3>
                 <p class="card-text">Generador Gasolina Krafter</p>
-                <a href="#" class="btn">Comprar ahora</a>
+                <a href="{% url 'productos' %}" class="btn">Ver mas</a>
             </div>
         </div>
         <!-- Agrega más tarjetas según sea necesario -->

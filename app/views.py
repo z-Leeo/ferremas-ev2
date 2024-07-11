@@ -21,6 +21,7 @@ from .serializers import ProductSerializer, MarcaSerializer
 
 
 
+
 class MarcaViewset(viewsets.ModelViewSet):
     queryset = Marca.objects.all()
     serializer_class = MarcaSerializer
@@ -59,10 +60,11 @@ def home (request):
         return redirect('home')
     return render (request , 'app/home.html')
 
-from django.shortcuts import redirect
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import render, redirect
 from django.views import View
+from django.contrib.auth.models import Group
 
 class LoginView(View):
     def get(self, request):
@@ -72,40 +74,126 @@ class LoginView(View):
     def post(self, request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-            if user.user_type == 'bodeguero':
-                return redirect('bodeguero')
-            elif user.user_type == 'contador':
-                return redirect('contador')
-            elif user.user_type == 'administrador':
-                return redirect('administrador')
-            elif user.user_type == 'vendedor':
-                return redirect('vendedor')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                auth_login(request, user)
+                if user.groups.filter(name='bodeguero').exists():
+                    return redirect('warehouse_dashboard')
+                elif user.groups.filter(name='contador').exists():
+                    return redirect('accountant_dashboard')
+                elif user.groups.filter(name='administrador').exists():
+                    return redirect('admin_dashboard')
+                elif user.groups.filter(name='vendedor').exists():
+                    return redirect('sales_dashboard')
+                else:
+                    return redirect('home')  # Redirige a la home si no pertenece a ningún grupo
         return render(request, 'registration/login.html', {'form': form})
 
-@login_required
-def bodeguero_view(request):
-    return render(request, 'app/bodeguero.html')
 
-@login_required
-def contador_view(request):
-    return render(request, 'app/contador.html')
+from django.shortcuts import render
+from django.views import View
 
-@login_required
-def administrador_view(request):
-    return render(request, 'app/administrador.html')
+class AdminDashboardView(View):
+    def get(self, request):
+        return render(request, 'app/admin_dashboard.html')
 
-@login_required
-def vendedor_view(request):
-    return render(request, 'app/vendedor.html')
+class WarehouseDashboardView(View):
+    def get(self, request):
+        return render(request, 'app/warehouse_dashboard.html')
+
+class AccountantDashboardView(View):
+    def get(self, request):
+        return render(request, 'app/accountant_dashboard.html')
+
+class SalesDashboardView(View):
+    def get(self, request):
+        return render(request, 'app/sales_dashboard.html')
+# app/views.py
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from django.contrib import messages
+from .forms import CustomUserCreationForm
 
 def registro(request):
-    return render(request, 'registration/registro.html')
+    data = {
+        'form': CustomUserCreationForm()
+    }
+    if request.method == 'POST':
+        formulario = CustomUserCreationForm(request.POST)
+        if formulario.is_valid():
+            formulario.save()
+            username = formulario.cleaned_data.get('username')
+            raw_password = formulario.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            messages.success(request, 'Te has registrado correctamente.')
+            return redirect('home')
+        else:
+            data['form'] = formulario
+    return render(request, 'registration/registro.html', data)
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import CarritoItem, Product
+
 
 @login_required
 def pedido(request):
-    return render(request, 'app/pedido.html')
+    if request.method == 'POST':
+        # Procesar el formulario de pedido aquí
+        nombre = request.POST.get('nombre')
+        domicilio = request.POST.get('domicilio')
+        celular = request.POST.get('celular')
+        email = request.POST.get('email')
+        metodo_pedido = request.POST.get('metodo_pedido')
+        metodo_pago = request.POST.get('metodo_pago')
+
+        # Obtener productos en el carrito de alguna manera alternativa
+        carrito_items = CarritoItem.objects.all()  # Cambia esto a la lógica que usas en la vista del carrito
+
+        if not carrito_items:
+            return HttpResponseBadRequest('El carrito está vacío')
+
+        total_amount = sum(item.total for item in carrito_items)
+
+        # Almacenar la información del pedido en la sesión para pasarla a la vista de checkout
+        request.session['pedido_data'] = {
+            'nombre': nombre,
+            'domicilio': domicilio,
+            'celular': celular,
+            'email': email,
+            'metodo_pedido': metodo_pedido,
+            'metodo_pago': metodo_pago,
+            'total_amount': total_amount,
+        }
+
+        return redirect('checkout')
+    
+    else:
+        carrito_items = CarritoItem.objects.all()  # Cambia esto a la lógica que usas en la vista del carrito
+
+        if not carrito_items:
+            return HttpResponseBadRequest('El carrito está vacío')
+
+        total_amount = sum(item.total for item in carrito_items)
+        
+        data = {
+            'carrito_items': carrito_items,
+            'total_carrito': total_amount,
+        }
+        return render(request, 'app/pedido.html', data)
+
 
 @login_required
 def currencyApi(request):
@@ -153,7 +241,7 @@ def convert_currency(request):
 @login_required
 def ProductView(request):
    # Ordena los productos por el campo 'nombre' (puedes cambiar 'nombre' por el campo que desees)
-    get_products = Product.objects.all()  
+    get_products = Product.objects.filter(stock__gt=0).order_by('name') 
     page = request.GET.get('page', 1)
     try:
         paginator = Paginator(get_products, 9)
@@ -203,14 +291,37 @@ def CheckOut(request):
 
 @login_required
 def PaymentSuccessful(request):
+    # Obtener todos los ítems en el carrito
     carrito_items = CarritoItem.objects.all()
+
+    # Procesar cada ítem en el carrito
     for item in carrito_items:
         producto = item.producto
         producto.stock -= item.cantidad
         producto.save()
-    
-    CarritoItem.objects.all().delete()  # Limpiar el carrito después del pago exitoso
-    return render(request, 'app/payment-success.html')
+
+    # Calcular el total del carrito (si es necesario para tu lógica)
+    total_carrito = sum(item.total for item in carrito_items)
+
+    # Limpiar el carrito después del pago exitoso
+    CarritoItem.objects.all().delete()
+
+    # Recuperar información del pedido desde la sesión
+    pedido_data = request.session.get('pedido_data', {})
+
+    context = {
+        'carrito_items': carrito_items,  # Pasar los ítems del carrito a la plantilla
+        'total_carrito': total_carrito,
+        'nombre': pedido_data.get('nombre'),
+        'domicilio': pedido_data.get('domicilio'),
+        'celular': pedido_data.get('celular'),
+        'email': pedido_data.get('email'),
+        'metodo_pedido': pedido_data.get('metodo_pedido'),
+        'metodo_pago': pedido_data.get('metodo_pago'),  # Pasar el total del carrito si es necesario
+        # Ajustar según tu lógica de moneda
+    }
+
+    return render(request, 'app/payment-success.html', context)
 
 @login_required
 def paymentFailed(request):
@@ -251,6 +362,8 @@ def carrito(request):
             'productos_en_carrito': productos_en_carrito,
             'total_carrito': total_carrito,
         }
+
+    
         return render(request, 'app/carrito.html', data)
 
 def eliminar_producto(request, producto_id):

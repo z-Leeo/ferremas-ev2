@@ -3,7 +3,7 @@ from . import views
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import home,CheckOut,PaymentSuccessful,paymentFailed,ProductView,LoginView,registro, currencyApi, salir,carrito,pedido,ProductViewset,MarcaViewset, buscar
+from .views import home,CheckOut,PaymentSuccessful,paymentFailed,ProductView,LoginView,registro, currencyApi, salir,carrito,pedido,ProductViewset,MarcaViewset, buscar,AdminDashboardView, WarehouseDashboardView, AccountantDashboardView, SalesDashboardView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -25,8 +25,9 @@ urlpatterns = [
     path('pedido/', views.pedido, name='pedido'),
     path('buscar/', buscar, name='buscar'), # type: ignore
     path('api/', include(router.urls)),
-    path('bodeguero/', views.bodeguero_view, name='bodeguero_view'),
-    path('contador/', views.contador_view, name='contador_view'),
-    path('administrador/', views.administrador_view, name='administrador_view'),
-    path('vendedor/', views.vendedor_view, name='vendedor_view'),
+    path('admin_dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
+    path('warehouse_dashboard/', WarehouseDashboardView.as_view(), name='warehouse_dashboard'),
+    path('accountant_dashboard/', AccountantDashboardView.as_view(), name='accountant_dashboard'),
+    path('sales_dashboard/', SalesDashboardView.as_view(), name='sales_dashboard'),
+    # Otras URLs de la aplicación
 ]
